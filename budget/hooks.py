@@ -1,10 +1,10 @@
 from . import __version__ as app_version
 
 app_name = "budget"
-app_title = "Budget"
-app_publisher = "ds"
-app_description = "ds"
-app_email = "ds@ds.com"
+app_title = "budge"
+app_publisher = "ahmed"
+app_description = "budget"
+app_email = "ahmed"
 app_license = "MIT"
 
 # Includes in <head>
@@ -117,6 +117,11 @@ app_license = "MIT"
 # Document Events
 # ---------------
 # Hook on document methods and events
+doc_events = {
+    "Department": {
+        "after_insert": "budget.budge.event.department.create_Head_role_for_department"
+    }
+}
 
 # doc_events = {
 #	"*": {
@@ -215,3 +220,32 @@ app_license = "MIT"
 # auth_hooks = [
 #	"budget.auth.validate"
 # ]
+
+# after_migrate = "budget.budget.setup_config.run"
+
+fixtures = [
+    {
+        "dt": "Client Script",
+        "filters": [
+            ["module", "=", "budge"]
+        ]
+    },
+    {
+        "dt": "Server Script",
+        "filters": [
+            ["module", "=", "budge"]
+        ]
+    },
+    {
+        "dt": "DocType",
+        "filters": [
+            ["module", "=", "budge"]
+        ]
+    },
+    {
+        "dt": "Custom Field",
+        "filters": [
+            ["module", "=", "budge"]
+        ]
+    }
+]

@@ -9,9 +9,9 @@ from budget import __version__ as version
 setup(
 	name="budget",
 	version=version,
-	description="ds",
-	author="ds",
-	author_email="ds@ds.com",
+	description="budget",
+	author="ahmed",
+	author_email="ahmed",
 	packages=find_packages(),
 	zip_safe=False,
 	include_package_data=True,
