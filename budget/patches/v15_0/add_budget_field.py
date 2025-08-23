@@ -34,3 +34,14 @@ def execute():
                 "hidden": 0
             }
         )
+    if not frappe.db.has_column("Budget Control", "budget_request"):
+        frappe.get_doc({
+            "doctype": "Custom Field",
+            "dt": "Budget Control",
+            "fieldname": "budget_request",
+            "fieldtype": "Link",
+            "label": "Budget Request",
+            "options": "Budget Request",
+            "insert_after": "name" 
+        }).insert(ignore_permissions=True)
+        frappe.db.commit()
