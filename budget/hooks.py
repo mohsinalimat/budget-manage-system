@@ -231,6 +231,18 @@ fixtures = [
         ]
     },
     {
+        "dt": "Report",
+        "filters": [["module", "=", "Budge"]]
+    },
+    {
+        "dt": "Custom HTML Block",
+        "filters": [["module", "=", "Budge"]]
+    },
+    {
+        "dt": "Number Card",
+        "filters": [["module", "=", "Budge"]]
+    },
+    {
         "dt": "Client Script",
         "filters": [
             ["module", "=", "budge"]
