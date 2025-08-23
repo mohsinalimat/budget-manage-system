@@ -5,6 +5,27 @@
 
 ## Features
 
+🚀 Budget Management System (BMS)
+✨ Key Features
+
+Automatic Monthly Allocation
+– Split annual budgets across months automatically.
+
+Control Screen
+– Adjust (Increase/Decrease) any month’s budget.
+– Distribute monthly budgets with advanced filters (by Item, Cost Center, Expense Account).
+
+Purchase Order Validation
+– Control overspending with Stop or Warning messages before submission when PO limits are exceeded.
+
+Powerful Reporting
+– Export budget reports anytime to PDF or Excel for analysis and sharing.
+
+Cascading Deletion (Sequential Delete)
+– Maintain clean data by ensuring related records are deleted in sequence.
+
+Budget Control Log
+– Track every adjustment (increase/decrease) with a full audit trail for transparency.
 ### 🎯 Budget
 Advanced budget control system with monthly distribution and automatic enforcement.
 
@@ -371,4 +392,3 @@ System Budget Check Process:
 **PS:** هذا مجرد البداية... المزيد من التحديثات المثيرة قادمة! 🔥
 
 **تابعني** لتكون أول من يعرف بالإطلاقات الجديدة! 👈
-
