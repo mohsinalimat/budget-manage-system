@@ -14,6 +14,10 @@ frappe.ui.form.on('Budget Control', {
                     function() {
                         // ✅ If confirmed
                         delete_budget_monthly_distribution(frm);
+                        frappe.show_alert({
+                            message: __('Budget Deleteted Successfully'),
+                            indicator: 'Green'
+                        });
                     },
                     function() {
                         // ❌ If cancelled

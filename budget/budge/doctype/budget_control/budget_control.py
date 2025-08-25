@@ -629,17 +629,19 @@ def update_budget_amount(cost_center, item_code, account, month, new_amount, act
 
         # تحديث Monthly Distribution
         success = update_monthly_distribution(md_name, month, new_amount, action)
-        monthly_dist_doc = frappe.get_doc("Monthly Distribution", md_name)
+   
 
-        if success:
+        if success and success.get("success") == True:
             # إضافة سجل في Budget Control Log
             create_budget_log(
-                monthly_dist_doc.budget,
+                success.get("budget_name"),
                 cost_center,
                 item_code,
                 account,
                 month,
-                new_amount,
+                success.get("old_amount"),
+                success.get("new_amount"),
+                success.get("changed_amount"),
                 frappe.session.user,
             )
 
@@ -704,12 +706,17 @@ def find_budget(cost_center, account, item_code):
 
 def update_monthly_distribution(md_name, month, diff_amount, action):
     try:
+        updated_table = {
+            'changed_amount':diff_amount,
+            "monthly_distribution": md_name
+
+        }
         if not md_name:
             frappe.throw(_("No Monthly Distribution linked"))
 
         monthly_dist_doc = frappe.get_doc("Monthly Distribution", md_name)
         budget_doc = frappe.get_doc("Budget", monthly_dist_doc.budget)
-
+        updated_table['budget_name'] = monthly_dist_doc.budget
         # تعديل الاجمالي
         budget_account = next(
             (
@@ -734,7 +741,9 @@ def update_monthly_distribution(md_name, month, diff_amount, action):
                 None,
             )
             if month_row:
+                updated_table['old_amount'] = month_row.custom_amount
                 month_row.custom_amount = (month_row.custom_amount or 0) + diff_amount
+                updated_table['new_amount'] = month_row.custom_amount
             else:
                 frappe.throw(_(f"{month} not found in {monthly_dist_doc.name}"))
                 
@@ -758,8 +767,9 @@ def update_monthly_distribution(md_name, month, diff_amount, action):
                 budget_account.db_set(
                     "budget_amount", max(0, budget_account.budget_amount - diff_amount)
                 )
+                updated_table['old_amount'] = month_row.custom_amount
                 month_row.custom_amount = (month_row.custom_amount or 0) - diff_amount
-
+                updated_table['new_amount'] = month_row.custom_amount
         # تحديث النسبة الجديدة
         total_precentage = sum([row.custom_amount for row in monthly_dist_doc.percentages])   
         if total_precentage > 0:
@@ -771,8 +781,11 @@ def update_monthly_distribution(md_name, month, diff_amount, action):
                 
         budget_doc.save()
         monthly_dist_doc.save()
-
-        return True
+        print ('==================================')
+        updated_table['success'] = True
+        print ('updated_table',updated_table)
+        print ('==================================')
+        return updated_table
 
     except Exception as e:
         frappe.log_error(
@@ -806,7 +819,7 @@ def create_monthly_distribution(budget_doc, month, amount):
 
 
 def create_budget_log(
-    budget_name, cost_center, item_code, account, month, new_amount, user
+    budget_name, cost_center, item_code, account, month, old_amount, new_amount, changed_amount, user
 ):
     """
     Create audit log for budget changes
@@ -820,7 +833,9 @@ def create_budget_log(
             log_doc.item_code = item_code
             log_doc.account = account
             log_doc.month = month
+            log_doc.old_amount = old_amount
             log_doc.new_amount = new_amount
+            log_doc.change_amount = changed_amount
             log_doc.changed_by = user
             log_doc.change_date = nowdate()
             log_doc.save()

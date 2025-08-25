@@ -271,4 +271,11 @@ fixtures = [
             ["module", "=", "budge"]
         ]
     },
+    {
+        "doctype": "Custom Field",
+        "filters": [
+            ["dt", "=", "Department"],
+            ["fieldname", "=", "custom_manager"]
+        ]
+    }
 ]

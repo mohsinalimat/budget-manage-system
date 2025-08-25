@@ -2,7 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "field:budget_name",
- "creation": "2024-02-11 16:29:17.499345",
+ "creation": "2025-08-23 11:26:23.886498",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -106,13 +106,9 @@
   {
    "link_doctype": "Budget Request",
    "link_fieldname": "budget_control"
-  },
-  {
-   "link_doctype": "Department",
-   "link_fieldname": "name"
   }
  ],
- "modified": "2025-08-22 22:44:27.264618",
+ "modified": "2025-08-25 22:05:07.474631",
  "modified_by": "Administrator",
  "module": "budge",
  "name": "Budget Control",
@@ -133,6 +129,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

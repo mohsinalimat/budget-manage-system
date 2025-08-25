@@ -33,7 +33,7 @@ class BudgetControlLog(Document):
         """Calculate the change amount"""
         old_amount = flt(self.old_amount or 0)
         new_amount = flt(self.new_amount or 0)
-        self.change_amount = new_amount - old_amount
+        # self.change_amount = new_amount - old_amount
     
     def set_defaults(self):
         """Set default values"""

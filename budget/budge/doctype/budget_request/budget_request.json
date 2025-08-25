@@ -141,13 +141,8 @@
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
- "links": [
-  {
-   "link_doctype": "Budget Control",
-   "link_fieldname": "budget_request"
-  }
- ],
- "modified": "2025-08-25 18:54:36.249274",
+ "links": [],
+ "modified": "2025-08-25 22:09:32.790151",
  "modified_by": "Administrator",
  "module": "budge",
  "name": "Budget Request",
