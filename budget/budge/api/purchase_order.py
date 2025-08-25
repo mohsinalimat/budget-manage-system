@@ -438,7 +438,7 @@ def validate_against_monthly_budget(current_items, updated_totals, monthly_alloc
 
         if total_after_po > monthly_budget:
             excess_data = {
-                "item_code": None,  # or representative one
+                "item_code": item.get("item_code"),  # or representative one
                 "cost_center": cost_center,
                 "expense_account": expense_account,
                 "monthly_budget": monthly_budget,
