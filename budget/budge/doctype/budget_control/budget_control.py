@@ -723,46 +723,52 @@ def update_monthly_distribution(md_name, month, diff_amount, action):
             frappe.throw(_("Account not found in Budget"))
 
         if action == "increase":
-            # budget_account.budget_amount += diff_amount
+            # تعديل البادجيت الاحمالي
             budget_account.db_set(
                 "budget_amount", budget_account.budget_amount + diff_amount
             )
-        else:
-            budget_account.db_set(
-                "budget_amount", max(0, budget_account.budget_amount - diff_amount)
+
+            # # تعديل الشهر
+            month_row = next(
+                (row for row in monthly_dist_doc.percentages if row.month == month),
+                None,
             )
-            # budget_account.budget_amount = max(0, budget_account.budget_amount - diff_amount)
+            if month_row:
+                month_row.custom_amount = (month_row.custom_amount or 0) + diff_amount
+            else:
+                frappe.throw(_(f"{month} not found in {monthly_dist_doc.name}"))
+                
+        if action == "decrease":
 
-        # تعديل الشهر
-        found = False
-        for row in monthly_dist_doc.percentages:
-            if row.month == month:
-                if action == "increase":
-                    row.custom_amount = (row.custom_amount or 0) + diff_amount
-                else:
-                    row.custom_amount = max(0, (row.custom_amount or 0) - diff_amount)
+            if diff_amount > budget_account.budget_amount:
+                frappe.throw(_("Deduction exceeds total annual Budget Amount"))
 
-                # تحديث النسبة الجديدة
-                if budget_account.budget_amount > 0:
-                    row.percentage_allocation = (
-                        row.custom_amount / budget_account.budget_amount
-                    ) * 100
-                found = True
-                break
+            month_row = next((row for row in monthly_dist_doc.percentages if row.month == month), None)   
 
-        if not found:
-            frappe.throw(f" {month} Not Found In {monthly_dist_doc.name}")
+             # # تعديل الشهر شرطين
+            #  - Greater than month NO
+            #  - Greater Than Budget No
+            if not month_row:
+                frappe.throw(_(f"{month} not found in {monthly_dist_doc.name}"))
 
-        # Update Precentage in Monthly Distribution
-        total_custom = sum([row.custom_amount for row in monthly_dist_doc.percentages])
-        if total_custom > 0:
-            for row in monthly_dist_doc.percentages:
-                row.percentage_allocation = (
-                    (row.custom_amount or 0) / total_custom * 100
+            if diff_amount > (month_row.custom_amount or 0):
+                frappe.throw(_("Deduction exceeds the Monthly allocated amount"))  
+
+            else:    
+                budget_account.db_set(
+                    "budget_amount", max(0, budget_account.budget_amount - diff_amount)
                 )
+                month_row.custom_amount = (month_row.custom_amount or 0) - diff_amount
+
+        # تحديث النسبة الجديدة
+        total_precentage = sum([row.custom_amount for row in monthly_dist_doc.percentages])   
+        if total_precentage > 0:
+            for row in monthly_dist_doc.percentages:
+                row.percentage_allocation = (row.custom_amount/total_precentage) * 100    
         else:
             for row in monthly_dist_doc.percentages:
                 row.percentage_allocation = 0
+                
         budget_doc.save()
         monthly_dist_doc.save()
 
