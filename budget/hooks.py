@@ -238,7 +238,7 @@ fixtures = [
     {
         "dt": "Workspace",
         "filters": [
-            ["module", "=", "budge"]
+            ["module", "=", "budge"]    
         ]
     },
     {
@@ -282,6 +282,24 @@ fixtures = [
         "doctype": "Custom Field",
         "filters": [
             ["dt", "=", "Treasury bills"]
+        ]
+    },
+     {
+        "doctype": "Custom Field",
+        "filters": [
+            ["dt", "=", "Budget Control"]
+        ]
+    },
+    {
+        "doctype": "Custom Field",
+        "filters": [
+            ["dt", "=", "Budget Request"]
+        ]
+    },
+        {
+        "doctype": "Custom Field",
+        "filters": [
+            ["dt", "=", "Budget "]
         ]
     }
 ]
