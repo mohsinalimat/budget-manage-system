@@ -1,0 +1,147 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"fHWzyq8EZR\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Budget Managment</span>\",\"col\":12}},{\"id\":\"vSBNHx2waD\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Budget\",\"col\":4}},{\"id\":\"3EP0ymGY81\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Cancelled Budget\",\"col\":4}},{\"id\":\"ojWRIkcFqe\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Budget Requests\",\"col\":4}},{\"id\":\"orY33kZE5Y\",\"type\":\"card\",\"data\":{\"card_name\":\"Budget & Monthly Distributions\",\"col\":4}},{\"id\":\"EJmbCaVBXC\",\"type\":\"card\",\"data\":{\"card_name\":\"Budget Control & Logs\",\"col\":4}},{\"id\":\"USd0S1zajK\",\"type\":\"card\",\"data\":{\"card_name\":\"Treasury Bills\",\"col\":4}},{\"id\":\"3fzYWCPnml\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Budget reports\",\"col\":12}}]",
+ "creation": "2025-09-11 01:56:23.083192",
+ "custom_blocks": [
+  {
+   "custom_block_name": "Budget reports",
+   "label": "Budget reports"
+  }
+ ],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "money-coins-1",
+ "idx": 0,
+ "indicator_color": "",
+ "is_hidden": 0,
+ "label": "Budget Managment",
+ "links": [
+  {
+   "description": "Budget & Monthly Distributions ",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Budget & Monthly Distributions",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Budget Request",
+   "link_count": 0,
+   "link_to": "Budget Request",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Budget",
+   "link_count": 0,
+   "link_to": "Budget",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Monthly Distribution",
+   "link_count": 0,
+   "link_to": "Monthly Distribution",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Term Type",
+   "link_count": 0,
+   "link_to": "Term Type",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Budget Control & Logs",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Budget Control",
+   "link_count": 0,
+   "link_to": "Budget Control",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Budget Control Log",
+   "link_count": 0,
+   "link_to": "Budget Control Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "description": "Treasury Bills",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Treasury Bills",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Treasury Bills",
+   "link_count": 0,
+   "link_to": "Treasury bills",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2025-09-14 01:14:30.192006",
+ "modified_by": "Administrator",
+ "module": "budge",
+ "name": "Budget Managment",
+ "number_cards": [
+  {
+   "label": "Active Budget",
+   "number_card_name": "Active Budget"
+  },
+  {
+   "label": "Cancelled Budget",
+   "number_card_name": "Cancelled Budget"
+  },
+  {
+   "label": "Budget Requests",
+   "number_card_name": "Budget Requests"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 28.0,
+ "shortcuts": [],
+ "title": "Budget Managment"
+}
