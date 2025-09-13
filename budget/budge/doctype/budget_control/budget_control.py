@@ -373,7 +373,6 @@ class BudgetControl(Document):
     def handle_submission_error(self, error):
         """Handle errors during submission"""
         import traceback
-        
         error_trace = traceback.format_exc()
         error_message = str(error)
         
@@ -423,7 +422,7 @@ def get_monthly_distribution_department(cost_center):
                 cost_center=md.custom_cost_center,
                 month=alloc.month,
             )
-            # print('aall',allocations)
+            
             allocations.append(
                 {
                     "item_code": md.custom_item_code,
@@ -436,7 +435,7 @@ def get_monthly_distribution_department(cost_center):
                     "remaining": requested - consumed,
                 }
             )
-            # print('md',md)
+            
 
     return allocations
 
@@ -781,10 +780,7 @@ def update_monthly_distribution(md_name, month, diff_amount, action):
                 
         budget_doc.save()
         monthly_dist_doc.save()
-        print ('==================================')
         updated_table['success'] = True
-        print ('updated_table',updated_table)
-        print ('==================================')
         return updated_table
 
     except Exception as e:
@@ -843,83 +839,6 @@ def create_budget_log(
     except Exception as e:
         # لا نريد أن يفشل التحديث بسبب مشكلة في التسجيل
         frappe.log_error(f"Error creating budget log: {str(e)}", "Budget Control Log")
-
-
-# @frappe.whitelist()
-# def get_monthly_distribution_department(cost_center):
-#     """
-#     Get budget data with monthly distribution breakdown
-#     Enhanced version with better error handling
-#     """
-#     try:
-#         if not cost_center:
-#             return []
-
-#         # استعلام محسن للحصول على بيانات الميزانية
-#         sql_query = """
-#         SELECT
-#             b.name as budget_name,
-#             b.cost_center,
-#             b.item_code,
-#             ba.account,
-#             ba.budget_amount as requested,
-#             COALESCE(actual.actual_amount, 0) as consumed,
-#             (ba.budget_amount - COALESCE(actual.actual_amount, 0)) as remaining,
-#             md.distribution_id,
-#             mdp.month,
-#             (ba.budget_amount * mdp.percentage_allocation / 100) as monthly_amount
-#         FROM
-#             `tabBudget` b
-#         LEFT JOIN
-#             `tabBudget Account` ba ON b.name = ba.parent
-#         LEFT JOIN
-#             `tabMonthly Distribution` md ON b.monthly_distribution = md.name
-#         LEFT JOIN
-#             `tabMonthly Distribution Percentage` mdp ON md.name = mdp.parent
-#         LEFT JOIN (
-#             SELECT
-#                 account,
-#                 cost_center,
-#                 SUM(debit - credit) as actual_amount
-#             FROM
-#                 `tabGL Entry`
-#             WHERE
-#                 cost_center = %(cost_center)s
-#                 AND posting_date >= DATE_FORMAT(NOW(), '%%Y-01-01')
-#                 AND posting_date <= NOW()
-#             GROUP BY
-#                 account, cost_center
-#         ) actual ON ba.account = actual.account AND b.cost_center = actual.cost_center
-#         WHERE
-#             b.cost_center = %(cost_center)s
-#             AND b.docstatus = 1
-#         ORDER BY
-#             b.name, mdp.month
-#         """
-
-#         result = frappe.db.sql(sql_query, {"cost_center": cost_center}, as_dict=True)
-
-#         # معالجة البيانات وتنسيقها
-#         processed_data = []
-#         for row in result:
-#             processed_row = {
-#                 "budget_name": row.get("budget_name"),
-#                 "cost_center": row.get("cost_center"),
-#                 "item_code": row.get("item_code") or "N/A",
-#                 "account": row.get("account") or "N/A",
-#                 "month": row.get("month") or "N/A",
-#                 "requested": flt(row.get("monthly_amount", 0)),
-#                 "consumed": flt(row.get("consumed", 0)),
-#                 "remaining": flt(row.get("monthly_amount", 0)) - flt(row.get("consumed", 0)),
-#                 "amount": flt(row.get("monthly_amount", 0))  # للتوافق مع الكود السابق
-#             }
-#             processed_data.append(processed_row)
-
-#         return processed_data
-
-#     except Exception as e:
-#         frappe.log_error(f"Error getting monthly distribution: {str(e)}", "Budget Control Query")
-#         return []
 
 
 @frappe.whitelist()

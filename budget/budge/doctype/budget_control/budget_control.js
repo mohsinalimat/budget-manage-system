@@ -945,22 +945,22 @@ function render_modern_budget_dashboard(frm, items) {
             <div class="filter-section">
                 <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
                     <select id="filter-item-code" class="form-control input-sm" style="flex:1; min-width:150px;">
-                        <option value="">All Items / جميع الأصناف</option>
+                        <option value="">All Items </option>
                         ${uniqueItems.map(code => `<option value="${code}">${code}</option>`).join('')}
                     </select>
                 
                     <select id="filter-expense-account" class="form-control input-sm" style="flex:1; min-width:150px;">
-                        <option value="">All Accounts / جميع الحسابات</option>
+                        <option value="">All Accounts </option>
                         ${uniqueAccounts.map(account => `<option value="${account}">${account}</option>`).join('')}
                     </select>
                 
                     <select id="filter-month" class="form-control input-sm" style="flex:1; min-width:120px;">
-                        <option value="">All Months / جميع الشهور</option>
+                        <option value="">All Months </option>
                         ${uniqueMonths.map(month => `<option value="${month}">${month}</option>`).join('')}
                     </select>
                 
-                    <button id="apply-filters" class="btn btn-primary btn-sm">Apply / تطبيق</button>
-                    <button id="reset-filters" class="btn btn-secondary btn-sm">Reset / إعادة تعيين</button>
+                    <button id="apply-filters" class="btn btn-primary btn-sm">Apply</button>
+                    <button id="reset-filters" class="btn btn-secondary btn-sm">Reset </button>
                 </div>
             </div>
 
@@ -1380,17 +1380,21 @@ function getBudgetStatus(percent) {
 }
 
 function formatCurrency(amount) {
-    if (amount === null || amount === undefined) {
-        return 'EGP 0';
+    const currency = frappe?.sys_defaults?.currency || "USD";
+
+    if (amount === null || amount === undefined || isNaN(amount)) {
+        amount = 0;
     }
-    
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP',
+
+    // Format number only (no currency symbol)
+    const formattedNumber = new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
     }).format(amount);
+
+    return `${formattedNumber} ${currency}`;
 }
+
 
 // Additional utility functions for better user experience
 frappe.ui.form.on('Budget Control', {
