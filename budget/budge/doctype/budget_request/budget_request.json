@@ -2,7 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "format:BR-{department}-{fiscal_year}-{#####}",
- "creation": "2025-08-23 11:26:25.354081",
+ "creation": "2025-09-11 03:34:13.650541",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -54,7 +54,7 @@
    "fieldname": "budget_controller",
    "fieldtype": "Select",
    "label": "Budget Controller",
-   "options": "\nFinancial\nEmployee"
+   "options": "\nDepartmental\nFinancial\nEmployee"
   },
   {
    "fieldname": "column_break_z89bl",
@@ -142,7 +142,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-25 22:09:32.790151",
+ "modified": "2025-09-11 03:43:19.963648",
  "modified_by": "Administrator",
  "module": "budge",
  "name": "Budget Request",
