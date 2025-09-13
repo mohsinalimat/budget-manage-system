@@ -6,7 +6,7 @@
   }
  ],
  "content": "[{\"id\":\"jxElEZDoqz\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h2\\\">Budget &amp; Treasury bills</span>\",\"col\":12}},{\"id\":\"BLOi5_JNJt\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Budget\",\"col\":4}},{\"id\":\"jFI1UJSpv8\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Cancelled Budget\",\"col\":4}},{\"id\":\"G7fUZWwybv\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Budget Requests\",\"col\":4}},{\"id\":\"EVpwSC6UXU\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Treasury Bills Sessions\",\"col\":12}},{\"id\":\"k8ItoFyOnh\",\"type\":\"card\",\"data\":{\"card_name\":\"Budget\",\"col\":4}},{\"id\":\"Og1-31CSU7\",\"type\":\"card\",\"data\":{\"card_name\":\"Treasury Bills\",\"col\":4}},{\"id\":\"phO4gfxB97\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Budget reports\",\"col\":12}}]",
- "creation": "2025-08-23 10:16:18.504735",
+ "creation": "2025-09-11 01:41:06.947953",
  "custom_blocks": [
   {
    "custom_block_name": "Budget reports",
@@ -19,7 +19,7 @@
  "hide_custom": 0,
  "icon": "income",
  "idx": 0,
- "is_hidden": 0,
+ "is_hidden": 1,
  "label": "Budget & Treasury bills",
  "links": [
   {
@@ -197,7 +197,7 @@
    "type": "Link"
   }
  ],
- "modified": "2025-08-23 10:17:32.745312",
+ "modified": "2025-09-11 02:30:38.244229",
  "modified_by": "Administrator",
  "module": "budge",
  "name": "Budget & Treasury bills",
@@ -215,6 +215,7 @@
    "number_card_name": "Active Budget"
   }
  ],
+ "owner": "Administrator",
  "parent_page": "",
  "public": 1,
  "quick_lists": [],
