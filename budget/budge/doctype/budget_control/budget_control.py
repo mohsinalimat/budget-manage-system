@@ -14,34 +14,34 @@ class BudgetControl(Document):
         self.validate_required_fields()
         self.delete_draft_budget_control()
         self.validate_submitted_budget_control()
-        self.validate_budget_controller()       
+        self.validate_budget_controller()
     def on_submit(self):
         """Actions to perform after document submission"""
         try:
             self.create_budget_requests()
         except Exception as e:
             self.handle_submission_error(e)
-    
+
     def validate_required_fields(self):
         """Validate that all required fields are filled"""
         required_fields = [
-            'budget_controller', 'department', 'cost_center', 
+            'budget_controller', 'department', 'cost_center',
             'fiscal_year', 'budget_name', 'status'
         ]
-        
+
         missing_fields = []
         for field in required_fields:
             field_value = getattr(self, field, None)
             if not field_value or (isinstance(field_value, str) and not field_value.strip()):
                 missing_fields.append(field)
-        
+
         if missing_fields:
             fields_list = ", ".join([f"'{field}'" for field in missing_fields])
             frappe.throw(
                 _("The following required fields are missing: {0}").format(fields_list),
                 title=_("Required Fields Missing")
             )
-    
+
     def validate_fiscal_year(self):
         """Validate fiscal year exists and is active"""
         if not frappe.db.exists("Fiscal Year", self.fiscal_year):
@@ -49,7 +49,7 @@ class BudgetControl(Document):
                 _("Fiscal Year '{0}' does not exist").format(self.fiscal_year),
                 title=_("Invalid Fiscal Year")
             )
-    
+
     def validate_budget_controller(self):
         """Validate budget controller value"""
         valid_controllers = ['Financial', 'Departmental', 'Project', 'Employee']
@@ -58,11 +58,11 @@ class BudgetControl(Document):
                 _("Budget Controller must be one of: {0}").format(", ".join(valid_controllers)),
                 title=_("Invalid Budget Controller")
             )
-    
+
     def delete_draft_budget_control(self):
         """Handle duplicate budget controls for the same cost center"""
         duplicates = frappe.get_list(
-            'Budget Control', 
+            'Budget Control',
             filters={
                 'cost_center': self.cost_center,
                 'fiscal_year': self.fiscal_year,
@@ -71,7 +71,7 @@ class BudgetControl(Document):
             },
             fields=['name', 'budget_name']
         )
-        
+
         if duplicates:
             print('d',duplicates)
             self.handle_duplicate_records(duplicates)
@@ -80,7 +80,7 @@ class BudgetControl(Document):
             Prevent Create Another Sumitted B Control
         '''
         duplicates = frappe.get_list(
-            'Budget Control', 
+            'Budget Control',
             filters={
                 'cost_center': self.cost_center,
                 'fiscal_year': self.fiscal_year,
@@ -89,7 +89,7 @@ class BudgetControl(Document):
             },
             fields=['name', 'budget_name']
         )
-        
+
         if duplicates:
             duplicate_names = [d.name for d in duplicates]
             frappe.throw(f"Found Existing Budget Controls {', '.join(duplicate_names)}")
@@ -106,29 +106,29 @@ class BudgetControl(Document):
             title=_("Duplicate Records Found"),
             indicator="orange"
         )
-        
+
         # Delete duplicates (you might want to add user confirmation here)
         deleted_count = 0
         errors = []
-        
+
         for duplicate in duplicates:
             try:
                 # Check if document can be deleted
                 doc = frappe.get_doc('Budget Control', duplicate.name)
                 if doc.docstatus == 1:  # Submitted document
                     doc.cancel()
-                
+
                 frappe.delete_doc('Budget Control', duplicate.name, force=True)
                 deleted_count += 1
-                
+
             except Exception as e:
                 error_msg = f"Failed to delete {duplicate.name}: {str(e)}"
                 errors.append(error_msg)
                 frappe.log_error(
-                    title="Budget Control Deletion Error", 
+                    title="Budget Control Deletion Error",
                     message=error_msg
                 )
-        
+
         # Report results
         if deleted_count > 0:
             frappe.msgprint(
@@ -136,23 +136,23 @@ class BudgetControl(Document):
                 title=_("Cleanup Complete"),
                 indicator="green"
             )
-        
+
         if errors:
             frappe.msgprint(
                 _("Some records could not be deleted. Check error logs for details."),
                 title=_("Partial Cleanup"),
                 indicator="yellow"
             )
-    
+
     def create_budget_requests(self):
         """Create budget requests based on budget controller type"""
         created_requests = []
-        
+
         if self.budget_controller == 'Financial':
             request = self.create_financial_budget_request()
             if request:
                 created_requests.append(request)
-        
+
         elif self.budget_controller == 'Departmental':
             request = self.create_departmental_budget_request()
             if request:
@@ -168,7 +168,7 @@ class BudgetControl(Document):
                 ),
                 title=_("Unsupported Controller Type")
             )
-        
+
         if created_requests:
             # self.show_success_message(created_requests)
             req_name = request.get('name')
@@ -183,7 +183,7 @@ class BudgetControl(Document):
                 title=_("No Action Taken"),
                 indicator="orange"
             )
-    
+
     def create_financial_budget_request(self):
         """Create a financial budget request"""
         doc_dict = {
@@ -200,26 +200,26 @@ class BudgetControl(Document):
         try:
             budget_request = frappe.get_doc(doc_dict)
             budget_request.insert()
-            
+
             frappe.log_error(
                 title="Budget Request Created Successfully",
                 message=f"Created Budget Request: {budget_request.name} for Budget Control: {self.name}"
             )
-            
+
             return {
                 'name': budget_request.name,
                 'department': cstr(budget_request.department),
                 'cost_center': cstr(budget_request.cost_center),
                 'type': 'Financial'
             }
-            
+
         except Exception as e:
             frappe.log_error(
                 title="Budget Request Creation Failed",
                 message=f"Failed to create budget request for {self.name}: {str(e)}"
             )
             raise e
-    
+
     def create_departmental_budget_request(self):
         """Create a departmental budget request"""
         # Similar to financial but with different logic
@@ -233,18 +233,18 @@ class BudgetControl(Document):
             'request_date': nowdate(),
             'status': 'Requested'
         }
-        
+
         try:
             budget_request = frappe.get_doc(doc_dict)
             budget_request.insert(ignore_permissions=True)
-            
+
             return {
                 'name': budget_request.name,
                 'department': cstr(budget_request.department),
                 'cost_center': cstr(budget_request.cost_center),
                 'type': 'Departmental'
             }
-            
+
         except Exception as e:
             frappe.log_error(
                 title="Departmental Budget Request Creation Failed",
@@ -264,26 +264,26 @@ class BudgetControl(Document):
             'request_date': nowdate(),
             'status': 'Requested'
         }
-        
+
         try:
             budget_request = frappe.get_doc(doc_dict)
             budget_request.insert(ignore_permissions=True)
-            
+
             return {
                 'name': budget_request.name,
                 'department': cstr(budget_request.department),
                 'cost_center': cstr(budget_request.cost_center),
                 'type': 'Employee'
             }
-            
+
         except Exception as e:
             frappe.log_error(
                 title="Departmental Budget Request Creation Failed",
                 message=f"Failed to create Employee budget request for {self.name}: {str(e)}"
             )
             raise e
-   
-    
+
+
     def on_cancel(self):
         """Actions to perform when document is cancelled"""
         try:
@@ -293,7 +293,7 @@ class BudgetControl(Document):
                 filters={'budget_control': self.name, 'docstatus': 1},
                 fields=['name']
             )
-            
+
             for request in related_requests:
                 try:
                     request_doc = frappe.get_doc('Budget Request', request.name)
@@ -306,40 +306,40 @@ class BudgetControl(Document):
                         title="Failed to cancel Budget Request",
                         message=f"Could not cancel {request.name}: {str(e)}"
                     )
-        
+
         except Exception as e:
             frappe.log_error(
                 title="Budget Control Cancellation Error",
                 message=f"Error during cancellation of {self.name}: {str(e)}"
             )
 
-            
+
     def show_success_message(self, requests_list):
         """Display success message with created requests details"""
         if not requests_list:
             return
-        
+
         # Create HTML message
         message_html = '<div style="text-align: center; padding: 20px;">'
         message_html += f'''
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
             <h3 style="margin: 0; font-size: 18px;">🎉 Budget Requests Created Successfully!</h3>
         </div>
         '''
-        
+
         message_html += '<div style="text-align: right;">'
         message_html += f'<p style="font-size: 16px; color: #2c3e50;"><strong>تم إنشاء {len(requests_list)} طلب ميزانية بنجاح:</strong></p>'
         message_html += '<div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">'
-        
+
         for req in requests_list:
             req_name = req.get('name', 'N/A')
             req_dept = req.get('department', 'N/A')
             req_center = req.get('cost_center', 'N/A')
             req_type = req.get('type', 'Standard')
-            
+
             message_html += f'''
-            <div style="background: #f8f9fa; border: 2px solid #28a745; border-radius: 12px; 
+            <div style="background: #f8f9fa; border: 2px solid #28a745; border-radius: 12px;
                         padding: 20px; min-width: 250px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                 <div style="text-align: center; margin-bottom: 15px;">
                     <span style="font-size: 24px;">📋</span>
@@ -360,28 +360,28 @@ class BudgetControl(Document):
                 </div>
             </div>
             '''
-        
+
         message_html += '</div></div></div>'
-        
+
         frappe.msgprint({
             'title': _('Budget Control Processing Complete ✅'),
             'message': message_html,
             'indicator': 'green',
             'wide': True
         })
-    
+
     def handle_submission_error(self, error):
         """Handle errors during submission"""
         import traceback
         error_trace = traceback.format_exc()
         error_message = str(error)
-        
+
         # Log detailed error
         frappe.log_error(
             title=f"Budget Control Submission Error - {self.name}",
             message=f"Error: {error_message}\n\nFull Trace:\n{error_trace}"
         )
-        
+
         # Show user-friendly error
         frappe.throw(
             _("Failed to process Budget Control submission: {0}").format(error_message),
@@ -398,7 +398,7 @@ def get_monthly_distribution_department(cost_center):
         fields=[
             "name",
             "custom_expense_account",
-            "budget",
+            "custom_budget",
             "custom_cost_center",
             "custom_item_code",
         ],
@@ -422,7 +422,7 @@ def get_monthly_distribution_department(cost_center):
                 cost_center=md.custom_cost_center,
                 month=alloc.month,
             )
-            
+
             allocations.append(
                 {
                     "item_code": md.custom_item_code,
@@ -435,7 +435,7 @@ def get_monthly_distribution_department(cost_center):
                     "remaining": requested - consumed,
                 }
             )
-            
+
 
     return allocations
 
@@ -628,7 +628,7 @@ def update_budget_amount(cost_center, item_code, account, month, new_amount, act
 
         # تحديث Monthly Distribution
         success = update_monthly_distribution(md_name, month, new_amount, action)
-   
+
 
         if success and success.get("success") == True:
             # إضافة سجل في Budget Control Log
@@ -668,21 +668,21 @@ def find_budget(cost_center, account, item_code):
             "account": account,
             "cost_center": cost_center,
         }
-        
+
 
         if item_code:
-            conditions += " AND ba.custom_item_code = %(item_code)s "  
-            filters["item_code"] = item_code  
+            conditions += " AND ba.custom_item_code = %(item_code)s "
+            filters["item_code"] = item_code
         query = f"""
-                select 
+                select
                     b.name as budget_name,
                     b.cost_center as cost_center,
                     ba.account as account,
                     ba.custom_item_code as item_code ,
                     ba.custom_monthly_distribution as monthly_distribution
                 from `tabBudget` b
-                left join `tabBudget Account` ba 
-                on ba.parent = b.name 
+                left join `tabBudget Account` ba
+                on ba.parent = b.name
                 WHERE {conditions}
             """
         result = frappe.db.sql(query, filters, as_dict=True)
@@ -714,7 +714,7 @@ def update_monthly_distribution(md_name, month, diff_amount, action):
             frappe.throw(_("No Monthly Distribution linked"))
 
         monthly_dist_doc = frappe.get_doc("Monthly Distribution", md_name)
-        budget_doc = frappe.get_doc("Budget", monthly_dist_doc.budget)
+        budget_doc = frappe.get_doc("Budget", monthly_dist_doc.custom_budget)
         updated_table['budget_name'] = monthly_dist_doc.budget
         # تعديل الاجمالي
         budget_account = next(
@@ -745,13 +745,13 @@ def update_monthly_distribution(md_name, month, diff_amount, action):
                 updated_table['new_amount'] = month_row.custom_amount
             else:
                 frappe.throw(_(f"{month} not found in {monthly_dist_doc.name}"))
-                
+
         if action == "decrease":
 
             if diff_amount > budget_account.budget_amount:
                 frappe.throw(_("Deduction exceeds total annual Budget Amount"))
 
-            month_row = next((row for row in monthly_dist_doc.percentages if row.month == month), None)   
+            month_row = next((row for row in monthly_dist_doc.percentages if row.month == month), None)
 
              # # تعديل الشهر شرطين
             #  - Greater than month NO
@@ -760,9 +760,9 @@ def update_monthly_distribution(md_name, month, diff_amount, action):
                 frappe.throw(_(f"{month} not found in {monthly_dist_doc.name}"))
 
             if diff_amount > (month_row.custom_amount or 0):
-                frappe.throw(_("Deduction exceeds the Monthly allocated amount"))  
+                frappe.throw(_("Deduction exceeds the Monthly allocated amount"))
 
-            else:    
+            else:
                 budget_account.db_set(
                     "budget_amount", max(0, budget_account.budget_amount - diff_amount)
                 )
@@ -770,14 +770,14 @@ def update_monthly_distribution(md_name, month, diff_amount, action):
                 month_row.custom_amount = (month_row.custom_amount or 0) - diff_amount
                 updated_table['new_amount'] = month_row.custom_amount
         # تحديث النسبة الجديدة
-        total_precentage = sum([row.custom_amount for row in monthly_dist_doc.percentages])   
+        total_precentage = sum([row.custom_amount for row in monthly_dist_doc.percentages])
         if total_precentage > 0:
             for row in monthly_dist_doc.percentages:
-                row.percentage_allocation = (row.custom_amount/total_precentage) * 100    
+                row.percentage_allocation = (row.custom_amount/total_precentage) * 100
         else:
             for row in monthly_dist_doc.percentages:
                 row.percentage_allocation = 0
-                
+
         budget_doc.save()
         monthly_dist_doc.save()
         updated_table['success'] = True

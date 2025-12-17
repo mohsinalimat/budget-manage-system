@@ -11,16 +11,16 @@ class BudgetRequest(Document):
         self.validate_budget_items()
         self.validate_cost_center()
         self.validate_duplicate_items()
-  
+
     def on_submit(self):
         self.posting_date = nowdate()
         self.status = "Requested"
         check_and_create_budget(self.name)
-          
+
     def validate_cost_center(self):
         if not self.cost_center:
             frappe.throw("Please select a Cost Center before submitting the form.")
-    
+
     def validate_budget_items(self):
         if not self.budget_items_details or len(self.budget_items_details) == 0:
             frappe.throw(_("Please add at least one budget item."))
@@ -58,12 +58,12 @@ class BudgetRequest(Document):
             else:
                 seen_accounts[item.expense_account] = item.idx
 
-             
-                
+
+
     def validate_duplicate_items(self):
         for row in self.budget_items_details:
             duplicates = frappe.db.sql("""
-                SELECT 
+                SELECT
                     br.name AS budget_request_name,
                     br.docstatus AS budget_request_status,
                     br.fiscal_year,
@@ -71,7 +71,7 @@ class BudgetRequest(Document):
                     bid.item_code,
                     bid.expense_account
                 FROM `tabBudget Request` br
-                LEFT JOIN `tabBudget Items Details` bid 
+                LEFT JOIN `tabBudget Items Details` bid
                     ON br.name = bid.parent
                 WHERE br.fiscal_year = %s
                   AND br.cost_center = %s
@@ -88,7 +88,7 @@ class BudgetRequest(Document):
             ), as_dict=True)
 
             if duplicates:
-        
+
                 frappe.throw(
                     _("Duplicate Budget Item found for Item Code <b>{0}</b>, Expense Account <b>{1}</b>, "
                       "Cost Center <b>{2}</b>, Fiscal Year <b>{3}</b> (Already exists in Request: {4})").format(
@@ -107,12 +107,12 @@ def check_and_create_budget(budget_request_name):
     """
     try:
         # إنشاء database lock لمنع التكرار
-        
+
         frappe.db.sql("SELECT GET_LOCK(%s, 10)", (f"budget_creation_{budget_request_name}",))
-        
+
         try:
             budget_request = frappe.get_doc("Budget Request", budget_request_name)
-            
+
             # فحص إذا كان البادجيت اتعمل خلاص
             if budget_request.budget_created:
                 frappe.throw("Budget already created for this request.")
@@ -120,7 +120,7 @@ def check_and_create_budget(budget_request_name):
                 #     "success": False,
                 #     "error": _("1Budget already created for this request.")
                 # }
-            
+
             # فحص للـ duplicate budgets
             duplicate_check = check_for_duplicate_budgets_server(budget_request)
             if duplicate_check["has_duplicate"]:
@@ -129,24 +129,30 @@ def check_and_create_budget(budget_request_name):
                 #     "success": False,
                 #     "error": duplicate_check["message"]
                 # }
-            
+
             # إنشاء البادجيت
             budget_name = create_budget_with_distributions_server(budget_request)
-            
-            # تحديث الـ Budget Request
-            frappe.db.set_value("Budget Request", budget_request_name, "budget_created", 1)
-            frappe.db.commit()
-            
-            return {
-                "success": True,
-                "budget_name": budget_name
-            }
-            
+            if budget_name:
+                print("*************?????***************")
+                # تحديث الـ Budget Request
+                frappe.db.set_value("Budget Request", budget_request_name, "budget_created", 1)
+                frappe.db.commit()
+                frappe.msgprint(
+                    _("Budget {0} is created successfully").format(budget_name)
+                )
+
+                return {
+                    "success": True,
+                    "budget_name": budget_name
+                }
+            else:
+                frappe.throw("ERROR Create Budget")
         finally:
-            msg = f"Budget {budget_name} For Is Created Successfully"
-            frappe.mesprint(msg)
-            frappe.db.sql("SELECT RELEASE_LOCK(%s)", (f"budget_creation_{budget_request_name}",))
-            
+            frappe.db.sql(
+                "SELECT RELEASE_LOCK(%s)",
+                (f"budget_creation_{budget_request_name}",)
+            )
+
     except Exception as e:
         frappe.db.rollback()
         frappe.log_error(
@@ -166,25 +172,25 @@ def check_for_duplicate_budgets_server(budget_request):
         accepted_items = [item for item in budget_request.budget_items_details if item.status == "Accepted"]
         fiscal_year = budget_request.fiscal_year
         cost_center = budget_request.cost_center
-        
+
         for item in accepted_items:
             # فحص وجود بادجيت مماثل
             existing_budget = frappe.db.sql("""
                 SELECT b.name as budget_name
                 FROM `tabBudget` b
                 JOIN `tabBudget Account` ba ON ba.parent = b.name
-                WHERE b.cost_center = %s 
-                AND b.fiscal_year = %s 
+                WHERE b.cost_center = %s
+                AND b.fiscal_year = %s
                 AND ba.account = %s
                 AND ba.custom_item_code = %s
                 AND b.docstatus != 2
             """, (cost_center, fiscal_year, item.expense_account, item.item_code), as_dict=True)
-            
+
             if existing_budget:
                 message = _("Budget already exists: '{0}' for Cost Center '{1}', Account '{2}' in Fiscal Year {3} item is '{4}' ").format(
-                    existing_budget[0].budget_name, 
-                    cost_center, 
-                    item.expense_account, 
+                    existing_budget[0].budget_name,
+                    cost_center,
+                    item.expense_account,
                     fiscal_year,
                     item.item_code
                 )
@@ -194,9 +200,9 @@ def check_for_duplicate_budgets_server(budget_request):
                     "has_duplicate": True,
                     "message": message
                 }
-        
+
         return {"has_duplicate": False}
-        
+
     except Exception as e:
         frappe.log_error(
             title="Error checking duplicates",
@@ -209,42 +215,43 @@ def create_budget_with_distributions_server(budget_request):
     Server-side budget creation with distributions
     """
     try:
-        print('ssssssssssssssssssssssssssssssssssssssssssssssssssssss')
         accepted_items = [item for item in budget_request.budget_items_details if item.status == "Accepted"]
-        
+        print('ssssssssssssssssssssssssssssssssssssssssssssssssssssss')
+        print('accepted_items',accepted_items)
         if not accepted_items:
             frappe.throw(_("No accepted budget items found to create budgets."))
-        
+
         accounts_table = []
-        
+
         # إنشاء Monthly Distribution لكل صف
         for item in accepted_items:
             # إنشاء Monthly Distribution
             monthly_dist = create_monthly_distribution_server(budget_request, item)
-            
-            # إعداد الـ account budget
-            account_budget = {
-                "account": item.expense_account,
-                "budget_amount": float(item.total or 0),
-                "custom_monthly_distribution": monthly_dist.name,
-                "custom_item_code": item.item_code
-            }
-            accounts_table.append(account_budget)
-        
-        # إنشاء البادجيت
-        budget = create_budget_document_server(budget_request, accounts_table)
-        
-        # ربط الـ distributions بالبادجيت
-        for row in accounts_table:
-            frappe.db.set_value(
-                'Monthly Distribution', 
-                row['custom_monthly_distribution'], 
-                'budget', 
-                budget.name
-            )
-        
-        return budget.name
-        
+            if monthly_dist:
+                print('monthly_dist',monthly_dist.name)
+                # إعداد الـ account budget
+                account_budget = {
+                    "account": item.expense_account,
+                    "budget_amount": float(item.total or 0),
+                    "custom_monthly_distribution": monthly_dist.name,
+                    "custom_item_code": item.item_code
+                }
+                accounts_table.append(account_budget)
+
+                # إنشاء البادجيت
+                budget = create_budget_document_server(budget_request, accounts_table)
+                print('budget',budget.name)
+                # ربط الـ distributions بالبادجيت
+                for row in accounts_table:
+                    frappe.db.set_value(
+                        'Monthly Distribution',
+                        row['custom_monthly_distribution'],
+                        'budget',
+                        budget.name
+                    )
+
+                return budget.name
+
     except Exception as e:
         frappe.log_error(
             title="Error creating budget",
@@ -267,43 +274,60 @@ def create_monthly_distribution_server(budget_request, item):
     for row in percentages:
         monthly_dist.append('percentages',row)
     monthly_dist.insert()
+    frappe.db.commit()
     return monthly_dist
 
 def create_budget_document_server(budget_request, accounts_table):
     """
     إنشاء البادجيت في الـ server
     """
-    budget = frappe.new_doc("Budget")
-    budget.budget_against = "Cost Center"
-    budget.cost_center = budget_request.cost_center
-    budget.fiscal_year = budget_request.fiscal_year
-    budget.custom_budget_control = budget_request.budget_control 
-    budget.custom_budget_request_reference = budget_request.name
-    budget.applicable_on_purchase_order = 1
-    budget.applicable_on_material_request = 1
-    budget.applicable_on_booking_actual_expenses = 1
-    budget.custom_action_if__monthly_budget_exceeded_on_po = 'Stop'
-    
-    # إضافة الـ accounts
-    for account_data in accounts_table:
-        budget.append("accounts", account_data)
-    
-    budget.insert()
-    budget.submit()
-    return budget
+    try:
+        print("\nBuilding budget document...")
+        budget = frappe.new_doc("Budget")
+        budget.budget_against = "Cost Center"
+        budget.cost_center = budget_request.cost_center
+        budget.fiscal_year = budget_request.fiscal_year
+        budget.custom_budget_control = budget_request.budget_control
+        budget.custom_budget_request_reference = budget_request.name
+        budget.applicable_on_purchase_order = 1
+        budget.applicable_on_material_request = 1
+        budget.applicable_on_booking_actual_expenses = 1
+        budget.custom_action_if__monthly_budget_exceeded_on_po = 'Stop'
+        print(f"Adding {len(accounts_table)} accounts to budget...")
+        # إضافة الـ accounts
+        for idx, account_data in enumerate(accounts_table):
+            budget.append("accounts", account_data)
+            print(f"  - Added account {idx+1}: {account_data['account']}")
 
+        print("Inserting budget...")
+        budget.insert()
+        print(f"Budget inserted with name: {budget.name}")
+
+        print("Submitting budget...")
+        budget.submit()
+        print(f"Budget submitted, docstatus: {budget.docstatus}")
+
+        frappe.db.commit()
+        print(f"Budget committed to database")
+    except Exception as e:
+        print(f"ERROR in create_budget_document_server: {str(e)}")
+        frappe.log_error(
+            title="Error creating budget document",
+            message=frappe.get_traceback()
+        )
+        raise
 def calculate_monthly_percentages_server(items):
     """
     حساب النسب الشهرية في الـ server
     """
-    month_list = ["january", "february", "march", "april", "may", "june", 
+    month_list = ["january", "february", "march", "april", "may", "june",
                   "july", "august", "september", "october", "november", "december"]
     month_names = ["January", "February", "March", "April", "May", "June",
                    "July", "August", "September", "October", "November", "December"]
-    
+
     total = 0
     monthly_values = {}
-    
+
     # جمع القيم لكل شهر
     for item in items:
         for month in month_list:
@@ -311,7 +335,7 @@ def calculate_monthly_percentages_server(items):
             value = qty * float(item.expected_price or 0)
             monthly_values[month] = monthly_values.get(month, 0) + value
             total += value
-    
+
     # إنشاء array النسب
     percentages = []
     for idx, name in enumerate(month_names):
@@ -322,15 +346,15 @@ def calculate_monthly_percentages_server(items):
             "custom_amount": monthly_values.get(month_key, 0),
             "percentage_allocation": round(perc, 4)
         })
-    
+
     return percentages
-    
+
 
 @frappe.whitelist()
 def delete_budget_related_records(budget_control_name):
     '''
         Delete
-            - {Budget} - Child Table: {Budget Account} 
+            - {Budget} - Child Table: {Budget Account}
             - {Monthly Distribution} - Child Table: {Monthly Distribution Percentages}
     '''
     try:
