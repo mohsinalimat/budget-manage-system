@@ -1,7 +1,30 @@
-## 📊 Budget Control Dashboard
+<div align="center">
+    <h1 style="font-size: 36px; color: white; font-weight: bold; margin-bottom:15px">Budget Control Management</h1>
+</div>
 
-![Budget Control Dashboard](budget_control.png)
 
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <b> WorkSpace</b><br>
+      <img src="workspace.png" width="100%" alt="WorkSpace">
+    </td>
+    <td align="center" width="50%">
+      <b> Table View</b><br>
+      <img src="tableView.png" width="100%" alt="جدول البيانات">
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <b> Export Monthly Budget</b><br>
+      <img src="exportBudgetMonth.png" width="100%" alt="تصدير الميزانية">
+    </td>
+    <td align="center" width="50%">
+      <b>Dialog Filters to Export Your Data</b><br>
+      <img src="dialog.png" width="100%" alt="نافذة الحوار">
+    </td>
+  </tr>
+</table>
 
 
 ## Installation
@@ -14,250 +37,353 @@
     mv budget-management-system/ budget
 3. Install the app on your site:
     ```bash
-    bench --site your-site-name install-app budget
+    be  nch --site your-site-name install-app budget
+
+# 📊 Budget Control Dashboard
+
+---
 
 ## Overview
 
 # Budget Management System
-        A comprehensive budget management feature for ERPNext that provides monthly budget distribution and real-time budget tracking with configurable actions when limits are exceeded.
 
-## Features
+A comprehensive budget management feature for ERPNext that provides monthly budget distribution and real-time budget tracking with configurable actions when limits are exceeded.
 
-🚀 Budget Management System (BMS)
-✨ Key Features:
+---
 
-Automatic Monthly Allocation
-– Split annual budgets across months automatically.
+## ✨ Key Features & 🏆 Benefits
 
-Control Screen
-– Adjust (Increase/Decrease) any month’s budget.
-– Distribute monthly budgets with advanced filters (by Item, Cost Center, Expense Account).
-
-Purchase Order Validation
-– Control overspending with Stop or Warning messages before submission when PO limits are exceeded.
-
-Powerful Reporting
-– Export budget reports anytime to PDF or Excel for analysis and sharing.
-
-Cascading Deletion (Sequential Delete)
-– Maintain clean data by ensuring related records are deleted in sequence.
-
-Budget Control Log
-– Track every adjustment (increase/decrease) with a full audit trail for transparency.
-
-
-### 🎯 Budget
-Advanced budget control system with monthly distribution and automatic enforcement.
-
-### 📊 Monthly Budget Distribution
-The system automatically distributes annual budgets across months with precise tracking:
-
-**Example Implementation:**
-- **Item:** Office Equipment Purchase
-- **Annual Budget:** 12,000 EGP
-- **Monthly Distribution:** 8.33% per month (1,000 EGP/month)
-
+### **Automatic Monthly Allocation**
 ```
-January: 8.33% (1,000 EGP)
-February: 8.33% (1,000 EGP)
-...
-December: 8.33% (1,000 EGP)
+Split annual budgets across months automatically.
+- Divide yearly budget into 12 equal monthly portions
+- Automatic calculation and distribution
+- Adjustable monthly allocations
 ```
+
+### **Control Screen**
+```
+┌─────────────────────────────────────────┐
+│  Budget Control Panel                   │
+│  ├─ Adjust (Increase/Decrease) monthly  │
+│  ├─ Advanced Filters:                   │
+│  │  ├─ By Item                          │
+│  │  ├─ By Cost Center                   │
+│  │  └─ By Expense Account               │
+│  └─ Real-time Budget Tracking           │
+└─────────────────────────────────────────┘
+```
+
+### **Purchase Order Validation**
+```
+Control overspending with Stop or Warning messages
+before submission when Purchase Order limits are exceeded.
+
+- Validate against monthly budget limit
+- Prevent overspending automatically
+- Configurable action (Stop/Warn)
+```
+
+### **Powerful Reporting**
+```
+Export budget reports anytime to PDF or Excel
+for analysis and sharing.
+
+- Generate comprehensive reports
+- Multiple export formats
+- Custom date ranges
+- Department-wise analysis
+```
+
+### **Cascading Deletion (Sequential Delete)**
+```
+Maintain clean data by ensuring related records
+are deleted in sequence.
+
+- Delete dependent records automatically
+- Maintain data integrity
+- Track deletion history
+```
+
+### **Budget Control Log**
+```
+Track every adjustment (increase/decrease) with
+a full audit trail for transparency.
+
+- Complete audit trail
+- All modifications tracked
+- User attribution
+- Timestamp recording
+```
+
+---
+## 🎬 Demo Video
+
+Check out the demo of **Budget Control Center**:
+
+[![Watch the Video](https://img.youtube.com/vi/6kc_sskH9Es/0.jpg)](https://youtu.be/6kc_sskH9Es?si=Ch9IMaZKkkGsiD8r)
 
 ---
 
 ## How It Works
 
-### Smart Budget Tracking
-ERPNext budget management goes beyond annual limits by providing monthly distribution for more precise control. When a month's budget is exhausted, the system can:
+### Complete Workflow Scenario
 
-- ❌ **Stop** transactions completely
-- ⚠️ **Warn** users while allowing transactions
+Step 1: Create Budget Control
+    ┌─────────────────────────────────────────────────────┐
+    │  Create Budget Control Document                     │
+    ├─────────────────────────────────────────────────────┤
+    │  (Name): Budget Control-2025-Marketing              │
+    │  ├─ Department: Marketing                           │
+    │  ├─ Fiscal Year: 2025                               │
+    │  ├─ Cost Center: Marketing                          │
+    │  └─ Status: Active                                  │
+    └─────────────────────────────────────────────────────┘
+            │
+            │ (Submit Budget Control) -> Budget Control-2025-Marketing
+            ↓
+        ✅ Ready for Budget Requests
 
-Configuration options:
-- `Action Action if Monthly Budget Exceeded on PO = Stop`
-- `Action Action if Monthly Budget Exceeded on PO = Warn`
+Step 2: Create Budget Request
 
----
+    ┌───────────────────────────────────────────────────────────┐
+    │  Create Budget Request Document                           │
+    ├───────────────────────────────────────────────────────────┤
+    │  (Name): BR-Marketing-2025-09                             │
+    │  ├─ Department: Marketing                                 │
+    │  ├─ Fiscal Year: 2025                                     │
+    │  ├─ Cost Center: Marketing                                │
+    │  ├─ Budget Control: Budget Control-2025-Marketing         │
+    │  └─ Status: Draft                                         │
+    │                                                           │
+    │  📋 Budget Items Details:                                 │
+    │  ├─ Item Code: ITEM A                                     │
+    │  ├─ Expected Price: 100.00 SAR                            │
+    │  ├─ Expense Account: Marketing Expenses - S               │
+    │  └─ Monthly Quantities:                                   │
+    │      ├─ Jan: 100 Qty                                      │
+    │      ├─ Feb: 100 Qty                                      │
+    │      ├─ ... (continuing)                                  │
+    │      └─ Dec: 100 Qty                                      │
+    └───────────────────────────────────────────────────────────┘
+        │
+        │ (Submit Budget Request) -> BR-Marketing-2025-09
+        ↓
+    ✅ Triggers Automatic Creation
 
-## Usage Examples
+Step 3: Auto-Generated Budget Document
 
-### ✅ Approved Transaction
-**January Scenario:**
-- Employee creates Purchase Order for 850 EGP
-- **Result:** ✅ Approved (under 1,000 EGP monthly limit)
+        ┌─────────────────────────────────────────────────────┐
+        │  Budget Document (Auto-Created)                     │
+        ├─────────────────────────────────────────────────────┤
+        │  Name: BUDGET-2025-01                               │
+        │  ├─ Budget Control: Budget Control-2025-Marketing   │
+        │  ├─ Cost Center: Marketing                          │
+        │  ├─ Fiscal Year: 2025                               │
+        │  ├─ Budget Request Ref: BR-Marketing-2025-09        │
+        │  ├─ Action if Budget Exceeded: Stop (0) / Warn (1)  │
+        │  │                                                  │
+        │  └─ Budget Accounts Table:                          │
+        │      ├─ Account: Marketing Expenses - S             │
+        │      ├─ Item Code: ITEM A                           │
+        │      ├─ Budget Amount: 10,000 SAR                   │
+        │      └─ Monthly Distribution: Auto-assigned         │
+        │          (BR-Mkt-2025-09-Marketing Expenses-S)      │
+        └─────────────────────────────────────────────────────┘
+            │
+            │ (Auto-creates Monthly Distribution)
+            ↓
+        ✅ Ready for Enforcement
 
-### ❌ Blocked/Warning Transaction
-**January Scenario:**
-- Employee attempts Purchase Order for 1,200 EGP
-- **Result:** ❌ Blocked or ⚠️ Warning shown (exceeds 8.33% monthly allocation)
 
-### System Behavior
-When attempting Purchase Orders exceeding the monthly limit (1,000 EGP in January), the system will:
-- Block the transaction if set to "Stop"
-- Show warning if set to "Warn"
+Step 4: Auto-Generated Monthly Distribution
 
----
+    ┌─────────────────────────────────────────────────────┐
+    │  Monthly Distribution Document (Auto-Created)       │
+    ├─────────────────────────────────────────────────────┤
+    │  Name: BR-Marketing-2025-09-Marketing Expenses-S    │
+    │                                                     │
+    │  Configuration:                                     │
+    │  ├─ Item Code: ITEM A                               │
+    │  ├─ Cost Center: Marketing                          │
+    │  ├─ Budget Control: Budget Control - 2025 - Mkt     │
+    │  ├─ Fiscal Year: 2025                               │
+    │  ├─ Expense Account: Marketing Expenses - S         │
+    │  ├─ Budget: BUDGET-2025-01                          │
+    │  ├─ Department: Marketing                           │
+    │  │                                                  │
+    │  └─ 📊 Monthly Distribution Percentages:            │
+    │      ├─ Month: January    │ Amount: 833.33 SAR      │
+    │      ├─ Month: February   │ Amount: 833.33 SAR      │
+    │      ├─ Month: March      │ Amount: 833.33 SAR      │
+    │      ├─ ... (continuing equally)                    │
+    │      └─ Month: December   │ Amount: 833.33 SAR      │
+    │         ────────────────────────────────────────    │
+    │         TOTAL: 10,000 SAR (12 months × 833.33)      │
+    └─────────────────────────────────────────────────────┘
 
-## Configuration
+# ** test Case **
 
-### Budget Actions
+# Step 5: Create Purchase Order (Within Budget)
+
+    ┌─────────────────────────────────────────────────────┐
+    │  Create Purchase Order                              │
+    ├─────────────────────────────────────────────────────┤
+    │  Month: December (Month 12)                         │
+    │  ├─ Item Code: ITEM A                               │
+    │  ├─ Expense Account: Marketing Expenses - S         │
+    │  ├─ Cost Center: Marketing                          │
+    │  ├─ Amount: 833.33 SAR                              │
+    │  └─ Status: Draft                                   │
+    └─────────────────────────────────────────────────────┘
+                │
+                │ (Submit Purchase Order)
+                │ Triggers Budget Validation
+                ↓
+    ┌─────────────────────────────────────────────────────┐
+    │  Budget Validation Check                            │
+    ├─────────────────────────────────────────────────────┤
+    │  ✅ December Budget Status:                         │
+    │  ├─ Monthly Limit: 833.33 SAR                       │
+    │  ├─ Already Spent: 0 SAR                            │
+    │  ├─ Available Balance: 833.33 SAR                   │
+    │  ├─ Request Amount: 833.33 SAR                      │
+    │  │                                                  │
+    │  └─ Validation: 833.33 ≤ 833.33 ✅ APPROVED         │
+    └─────────────────────────────────────────────────────┘
+                │
+                ↓
+    ┌─────────────────────────────────────────────────────┐
+    │  System Action                                      │
+    ├─────────────────────────────────────────────────────┤
+    │  ✅ Allow Transaction                               │
+    │  ├─ Status: SUBMITTED                               │
+    │  ├─ Update Budget Balance: 0 SAR remaining          │
+    │  ├─ Log Transaction in Audit Trail                  │
+    │  └─ Notify User: PO Successfully Created            │
+    └─────────────────────────────────────────────────────┘
+    Result: ✅ APPROVED - Purchase Order submitted successfully
+
+Step 6: Create Purchase Order (Exceeds Budget)
+
+        ┌─────────────────────────────────────────────────────┐
+        │  Create Purchase Order                              │
+        ├─────────────────────────────────────────────────────┤
+        │  Month: December (Month 12)                         │
+        │  ├─ Item Code: ITEM A                               │
+        │  ├─ Expense Account: Marketing Expenses - S         │
+        │  ├─ Cost Center: Marketing                          │
+        │  ├─ Amount: 10,001 SAR  ⚠️ (Exceeds limit)          │
+        │  └─ Status: Draft                                   │
+        └─────────────────────────────────────────────────────┘
+            │
+            │ (Submit Purchase Order)
+            │ Triggers Budget Validation
+            ↓
+        ┌─────────────────────────────────────────────────────┐
+        │  Budget Validation Check                            │
+        ├─────────────────────────────────────────────────────┤
+        │  ❌ December Budget Status:                         │
+        │  ├─ Monthly Limit: 833.33 SAR                       │
+        │  ├─ Already Spent: 0 SAR                            │
+        │  ├─ Available Balance: 833.33 SAR                   │
+        │  ├─ Request Amount: 10,001 SAR                      │
+        │  ├─ Exceeded Amount: 9,167.67 SAR                   │
+        │  │                                                  │
+        │  └─ Validation: 10,001 > 833.33 ❌ EXCEEDS          │
+        └─────────────────────────────────────────────────────┘
+            │
+            │ Check Configuration
+            ↓
+        ┌──────────────────────────────────────┐
+        │  Action if Budget Exceeded Setting   │
+        │  ├─ 0 = Stop (Block Transaction)     │
+        │  └─ 1 = Warn (Allow with Alert)      │
+        └──────────────────────────────────────┘
+            │
+            ├─────────────────┬────────────────────┐
+            │                 │                    │
+          (Stop)             (Warn)              (ignore)
+            │                 │
+            ↓                 ↓
+        ┌─────────────────────────────────────────────────────┐
+        │  Action 0: STOP MODE                                │
+        ├─────────────────────────────────────────────────────┤
+        │  🚫 TRANSACTION BLOCKED                             │
+        │  ├─ Error Message:                                  │
+        │  │  "Budget limit exceeded for December!            │
+        │  │   Monthly Budget: 833.33 SAR                     │
+        │  │   Requested: 10,001 SAR                          │
+        │  │   Exceeded by: 9,167.67 SAR                      │
+        │  │   Contact Finance Manager"                       │
+        │  │                                                  │
+        │  ├─ Status: BLOCKED                                 │
+        │  ├─ Cannot Submit PO                                │
+        │  ├─ Require Budget Override Approval                │
+        │  └─ Log: Blocked attempt recorded                   │
+        └─────────────────────────────────────────────────────┘
+        Result: ❌ BLOCKED - Budget limit exceeded
+
+        Alternative: WARN MODE
+
+        ┌─────────────────────────────────────────────────────┐
+        │  Action 1: WARN MODE                                │
+        ├─────────────────────────────────────────────────────┤
+        │  ⚠️ WARNING MESSAGE DISPLAYED                       │
+        │  ├─ Alert:                                          │
+        │  │  "⚠️ WARNING: Budget limit will be exceeded!     │
+        │  │   Monthly Budget: 833.33 SAR                     │
+        │  │   Requested: 10,001 SAR                          │
+        │  │   Would exceed by: 9,167.67 SAR                  │
+        │  │   Continue anyway?"                              │
+        │  │                                                  │
+        │  ├─ User Options:                                   │
+        │  │  ├─ [CONTINUE] - Allow with warning logged       │
+        │  │  └─ [CANCEL] - Stop and revise amount            │
+        │  │                                                  │
+        │  ├─ Status: ALLOWED WITH ALERT                      │
+        │  ├─ Can Submit PO (with warning recorded)           │
+        │  └─ Log: Override warning documented                │
+        └─────────────────────────────────────────────────────┘
+                                    │
+                                    ↓
+        ┌─────────────────────────────────────────────────────┐
+        │  System Action (If Continued)                       │
+        ├─────────────────────────────────────────────────────┤
+        │  ⚠️ Allow Transaction                               │
+        │  ├─ Status: SUBMITTED (with warning flag)           │
+        │  ├─ Update Budget Balance: -9,167.67 (OVER)         │
+        │  ├─ Send Alert to Finance Manager                   │
+        │  ├─ Log: Over-budget transaction recorded           │
+        │  └─ Flag: Requires manual review                    │
+        └─────────────────────────────────────────────────────┘
+        Result: ⚠️ WARNING - Allowed but flagged for review
+
+
+
+# 1- **Configuration Options**
+**Budget Actions**
 Configure system behavior when monthly budgets are exceeded:
 
-| Action | Description |
-|--------|-------------|
-| **Stop** | Completely prevent transactions exceeding monthly budget |
-| **Warn** | Show warning but allow transaction to proceed |
+- `Action if Monthly Budget Exceeded on Purchase Order = Stop`
+- `Action if Monthly Budget Exceeded on Purchase Order = Warn`
 
 ---
 
+# 2- **Control Options**
+**Control Month Budget**
 
-# Budget Control & Monitoring - Detailed Scenarios
+![Control Month Budget](control.png)
 
-📊 Current Budget Status (Example)
+Press **Increase** or **Decrease** to adjust the monthly allocation.
 
-    Department: Sales Department
-    Month: January 2024
-    Budget Items Status:
-    Office Equipment:
-        Monthly Allocation: 1,000 EGP
-        Spent to Date: 350 EGP
-        Remaining: 650 EGP (65%)
+---
 
-    Marketing Materials:
-        Monthly Allocation: 667 EGP
-        Spent to Date: 200 EGP
-        Remaining: 467 EGP (70%)
+# 3- **Control Logs**
+Every increase or decrease of the monthly budget will create a log record in the **Budget Control Log** Doctype for full audit and tracking.
 
-    Travel Expenses:
-        Monthly Allocation: 1,250 EGP
-        Spent to Date: 800 EGP
-        Remaining: 450 EGP (36%)
-    Sales Department - Budget Control Panel
-    Date: January 25, 2024, 3:45 PM
-═══════════════════════════════════════════════════════
+---
 
-🎯 Scenario 1: Normal Transaction (Within Budget)
+**Made with ❤️ for Better Budget Management**
 
-    Document Type: Material Request
-    Date: January 15, 2024
-    Employee: Ahmed Mohamed (Sales Executive)
-    Department: Sales Department
-    Cost Center: Sales - Head Office
-
-    Items Requested:
-    - Printer Cartridge: 150 EGP
-    - Office Supplies: 100 EGP
-    Total Amount: 250 EGP
-    Account: Office Equipment
-═══════════════════════════════════════════════════════
-
-User Experience:
-    ✅ SUCCESS MESSAGE:
-    "Material Request MR-2024-00123 approved successfully.
-    Budget Status: Office Equipment - 60% utilized (400 EGP remaining)"
-═══════════════════════════════════════════════════════
-
-⚠️ Scenario 2: Transaction Exceeding Monthly Budget (Warn Mode)
-
-🚫 Scenario 3: Transaction Blocked (Stop Mode)
-
-═══════════════════════════════════════════════════════
-
-🔔 Scenario 4: Budget Threshold Alerts
-
-    Trigger: When monthly budget reaches 75%
-    Account: Marketing Materials
-    Budget: 667 EGP
-    Consumed: 500 EGP (75%)
-
-    Email Alert:
-    To: Sales Manager, Finance Manager
-    Subject: "Budget Alert: Marketing Materials 75% Consumed"
-
-    Message: "
-    Marketing Materials budget for January 2024 has reached 75% utilization.
-    Current Status: 500/667 EGP used (167 EGP remaining)
-    Please monitor spending for the remainder of the month.
-    "
-═══════════════════════════════════════════════════════
-System Budget Check Process:
-
-    Step 1 - Budget Validation:
-    Target Account: Office Equipment
-    Monthly Budget: 1,000 EGP
-    Already Consumed: 350 EGP
-    Available Balance: 650 EGP
-    Request Amount: 250 EGP
-
-    Step 2 - Validation Result:
-    Check: 250 ≤ 650 ✅
-    Percentage Used: 60% (600/1000)
-    Status: APPROVED
-
-    Step 3 - System Action:
-    ✅ Allow Transaction
-    📝 Update Budget Balance
-    📊 New Balance: 400 EGP remaining
-    🔔 No alerts triggered
-═══════════════════════════════════════════════════════
-
-📈 Real-time Budget Dashboard
-
-    Sales Department - Budget Control Panel
-    Date: January 25, 2024, 3:45 PM
-    ═══════════════════════════════════════════════════════
-    MONTHLY BUDGET STATUS:
-
-    🔴 Office Equipment: [████████▓░] 120% (OVER BUDGET)
-    Budget: 1,000 EGP | Spent: 1,200 EGP | Over: -200 EGP
-
-    🟡 Travel Expenses: [█████████░] 90% (CRITICAL)
-    Budget: 1,250 EGP | Spent: 1,125 EGP | Remaining: 125 EGP
-
-    🟢 Marketing Materials: [██████░░░░] 60% (ON TRACK)
-    Budget: 667 EGP | Spent: 400 EGP | Remaining: 267 EGP
-
-    ═══════════════════════════════════════════════════════
-    RECENT TRANSACTIONS:
-
-    ⚠️ 2:30 PM - PO-2024-00456 - Laptop (1,200 EGP) - WARNING ISSUED
-    ✅ 1:15 PM - MR-2024-00234 - Stationery (85 EGP) - APPROVED
-    🚫 12:45 PM - PO-2024-00455 - Furniture (4,300 EGP) - BLOCKED
-
-    ═══════════════════════════════════════════════════════
-    PENDING APPROVALS:
-
-    📋 Budget Override Request - Office Equipment (+2,000 EGP)
-        Requested by: Fatima Hassan
-        Status: Awaiting Finance Manager approval
-
-═══════════════════════════════════════════════════════
-
-🔄 Override & Exception Process
-
-    Budget Override Workflow:
-
-    Scenario: Department needs to exceed monthly budget
-
-    Step 1 - Override Request:
-    User: Department Manager
-    Reason: "Urgent laptop replacement for key client presentation"
-    Amount: 1,200 EGP
-    Account: Office Equipment
-    Justification: "Client meeting tomorrow, laptop crashed"
-
-    Step 2 - Approval Chain:
-    Level 1: Department Head ✅
-    Level 2: Finance Manager (Pending...)
-    Level 3: General Manager (if > 5,000 EGP)
-
-    Step 3 - If Approved:
-    🔓 Temporary budget increase
-    📝 Updated monthly allocation
-    ✅ Allow specific transaction
-    📊 Log exception in reports
-
-
-
-#ERPNext #FrappeFramework #BudgetManagement #FinancialControl #Innovation #TechSolution #DigitalTransformation #StartupLife #AppDevelopment #BusinessIntelligence
+#ERPNext #FrappeFramework #BudgetManagement #FinancialControl #CrownCode #TechSolution #DigitalTransformation #AppDevelopment #BusinessIntelligence

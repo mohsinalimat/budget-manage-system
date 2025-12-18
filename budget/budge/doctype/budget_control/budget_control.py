@@ -389,12 +389,16 @@ class BudgetControl(Document):
         )
 
 @frappe.whitelist()
-def get_monthly_distribution_department(cost_center):
+def get_monthly_distribution_department(cost_center, fiscal_year, department):
     allocations = []
     # هات كل الـ Monthly Distributions الخاصة بالـ Cost Center
     monthly_distributions = frappe.get_all(
         "Monthly Distribution",
-        filters={"custom_cost_center": cost_center},
+        filters={
+            "custom_cost_center": cost_center,
+            "fiscal_year":fiscal_year,
+            "custom_department":department
+             },
         fields=[
             "name",
             "custom_expense_account",
@@ -403,7 +407,7 @@ def get_monthly_distribution_department(cost_center):
             "custom_item_code",
         ],
     )
-
+    print("monthly_distributions",monthly_distributions)
     for md in monthly_distributions:
         # هات تفاصيل النسب الشهرية
         monthly_allocations = frappe.get_all(
@@ -571,11 +575,11 @@ def get_consumed_amount(item_code, account, cost_center, month):
 
 # دالة مساعدة لإرجاع تقرير مفصل (إختياري)
 @frappe.whitelist()
-def get_monthly_distribution_report(cost_center="Carriers - AEC", month=None):
+def get_monthly_distribution_report(cost_center, fiscal_year, department, month=None):
     """
     إرجاع تقرير مفصل للتوزيع الشهري
     """
-    data = get_monthly_distribution_department(cost_center)
+    data = get_monthly_distribution_department(cost_center, fiscal_year, department)
 
     if month:
         # فلترة البيانات حسب الشهر المحدد

@@ -238,19 +238,21 @@ def create_budget_with_distributions_server(budget_request):
                 }
                 accounts_table.append(account_budget)
 
-                # إنشاء البادجيت
-                budget = create_budget_document_server(budget_request, accounts_table)
-                print('budget',budget.name)
-                # ربط الـ distributions بالبادجيت
-                for row in accounts_table:
-                    frappe.db.set_value(
-                        'Monthly Distribution',
-                        row['custom_monthly_distribution'],
-                        'budget',
-                        budget.name
-                    )
+        # إنشاء البادجيت
+        budget = create_budget_document_server(budget_request, accounts_table)
+        print('budget',budget.name)
+        monthly_dist.db_set("custom_budget", budget.name)
+        frappe.db.commit()
+        # ربط الـ distributions بالبادجيت
+        for row in accounts_table:
+            frappe.db.set_value(
+                'Monthly Distribution',
+                row['custom_monthly_distribution'],
+                'budget',
+                budget.name
+            )
 
-                return budget.name
+        return budget.name
 
     except Exception as e:
         frappe.log_error(
@@ -268,7 +270,9 @@ def create_monthly_distribution_server(budget_request, item):
     monthly_dist.fiscal_year = budget_request.fiscal_year
     monthly_dist.custom_expense_account = item.expense_account
     monthly_dist.custom_cost_center = budget_request.cost_center
+    monthly_dist.custom_budget_control = budget_request.budget_control
     monthly_dist.custom_item_code = item.item_code
+    monthly_dist.custom_department = budget_request.department
     # حساب النسب الشهرية
     percentages = calculate_monthly_percentages_server([item])
     for row in percentages:
@@ -349,63 +353,141 @@ def calculate_monthly_percentages_server(items):
 
     return percentages
 
-
 @frappe.whitelist()
-def delete_budget_related_records(budget_control_name):
-    '''
-        Delete
-            - {Budget} - Child Table: {Budget Account}
-            - {Monthly Distribution} - Child Table: {Monthly Distribution Percentages}
-    '''
+def delete_budget_related_records(budget_control_name, fiscal_year, department, budget_controller, cost_center):
+    """
+    Delete all budget-related records in correct order:
+    1. Monthly Distribution Percentages (Child)
+    2. Monthly Distribution (Parent)
+    3. Budget Accounts (Child)
+    4. Budget (Parent) - but first unlink from Budget Request
+    5. Budget Items Details (Child)
+    6. Budget Request (Parent)
+    """
     try:
-        # 1️⃣ هات كل Budget Request المرتبطة بالـ Budget Control
+        print("\n========== START DELETE BUDGET RECORDS ==========")
+
+        # Get all Budget Requests matching filters
         budget_requests = frappe.get_all(
             "Budget Request",
-            filters={"budget_control": budget_control_name},
+            filters={
+                "budget_control": budget_control_name,
+                "fiscal_year": fiscal_year,
+                "department": department,
+                "budget_controller": budget_controller,
+                "cost_center": cost_center
+            },
             fields=["name"]
         )
 
+        print(f"Found {len(budget_requests)} Budget Requests")
+
         for br in budget_requests:
-            # امسح Child Table Budget Items Details
-            # frappe.db.sql("DELETE FROM `tabBudget Items Details` WHERE parent=%s", br.name)
-            # امسح Budget Request نفسه
-            # frappe.delete_doc("Budget Request", br.name, force=1)
-            # 2️⃣ هات الـ Budgets المرتبطة بالـ Budget Request
-            budgets = frappe.get_all(
-                "Budget",
-                filters={"custom_budget_request_reference": br.name},
-                fields=["name"]
-            )
+            br_name = br.name
+            print(f"\n--- Processing Budget Request: {br_name} ---")
 
-            for budget in budgets:
-                # Child Table: Budget Account
-                frappe.db.sql("DELETE FROM `tabBudget Account` WHERE parent=%s", budget.name)
-
-                # امسح Monthly Distribution المرتبط بالـ Budget
-                monthly_distributions = frappe.get_all(
-                    "Monthly Distribution",
-                    filters={"budget": budget.name},
+            try:
+                # Get budgets linked to this Budget Request
+                budgets = frappe.get_all(
+                    "Budget",
+                    filters={"custom_budget_request_reference": br_name},
                     fields=["name"]
                 )
 
-                for md in monthly_distributions:
-                    # Child Table: Percentages
-                    frappe.db.sql("DELETE FROM `tabMonthly Distribution Percentage` WHERE parent=%s", md.name)
-                    # frappe.delete_doc("Monthly Distribution", md.name, force=1)
-                    frappe.db.sql("DELETE FROM `tabMonthly Distribution` WHERE name=%s", md.name)
-                # امسح الـ Budget نفسه
-                # frappe.delete_doc("Budget", budget.name, force=1)
-                frappe.db.sql("DELETE FROM `tabBudget` WHERE name=%s", budget.name)
-            frappe.db.sql("DELETE FROM `tabBudget Request` WHERE name=%s", br.name)
+                print(f"Found {len(budgets)} Budgets for {br_name}")
 
-        # 3️⃣ في الاخر امسح Budget Control نفسه
-        # frappe.delete_doc("Budget Control", budget_control_name, force=1)
-        # frappe.db.sql("DELETE FROM `tabDepartments` WHERE parent=%s", budget_control_name)
-        # frappe.db.sql("DELETE FROM `tabBudget Control` WHERE name=%s",budget_control_name)
+                # Process each budget
+                for budget in budgets:
+                    budget_name = budget.name
+                    print(f"  Deleting Budget: {budget_name}")
 
-        frappe.db.commit()
-        return {"success": True, "message": f"Deleted all records for Budget Control {budget_control_name}"}
+                    # 1️⃣ Delete Monthly Distribution Percentages first
+                    monthly_distributions = frappe.get_all(
+                        "Monthly Distribution",
+                        filters={"custom_budget": budget_name},
+                        fields=["name"]
+                    )
+
+                    for md in monthly_distributions:
+                        md_name = md.name
+                        print(f"    - Deleting Monthly Distribution: {md_name}")
+
+                        # Delete percentages (child table)
+                        frappe.db.sql(
+                            "DELETE FROM `tabMonthly Distribution Percentage` WHERE parent=%s",
+                            (md_name,)
+                        )
+                        print(f" ✓ Deleted percentages")
+
+                        # Delete Monthly Distribution itself
+                        frappe.db.sql(
+                            "DELETE FROM `tabMonthly Distribution` WHERE name=%s",
+                            (md_name,)
+                        )
+                        print(f"      ✓ Deleted Monthly Distribution")
+
+                    # 2️⃣ Delete Budget Accounts (child table)
+                    frappe.db.sql(
+                        "DELETE FROM `tabBudget Account` WHERE parent=%s",
+                        (budget_name,)
+                    )
+                    print(f" ✓ Deleted Budget Accounts")
+
+                    # 3️⃣ Unlink budget from Budget Request BEFORE deleting
+                    frappe.db.sql(
+                        "UPDATE `tabBudget` SET custom_budget_request_reference=NULL WHERE name=%s",
+                        (budget_name,)
+                    )
+                    print(f"    ✓ Unlinked from Budget Request")
+
+                    # 4️⃣ Delete Budget itself
+                    frappe.db.sql(
+                        "DELETE FROM `tabBudget` WHERE name=%s",
+                        (budget_name,)
+                    )
+                    print(f"    ✓ Deleted Budget")
+
+                # 5️⃣ Now safe to delete Budget Request
+                # First delete Budget Items Details (child table)
+                frappe.db.sql(
+                    "DELETE FROM `tabBudget Items Details` WHERE parent=%s",
+                    (br_name,)
+                )
+                print(f"  ✓ Deleted Budget Items Details")
+
+                # Delete Budget Request itself
+                frappe.db.sql(
+                    "DELETE FROM `tabBudget Request` WHERE name=%s",
+                    (br_name,)
+                )
+                print(f"  ✓ Deleted Budget Request: {br_name}")
+
+                frappe.db.commit()
+
+            except Exception as e:
+                frappe.db.rollback()
+                print(f"ERROR processing {br_name}: {str(e)}")
+                frappe.log_error(
+                    title=f"Error deleting Budget Request {br_name}",
+                    message=frappe.get_traceback()
+                )
+                raise
+
+        print("\n========== DELETE COMPLETED SUCCESSFULLY ==========\n")
+
+        return {
+            "success": True,
+            "message": f"Successfully deleted all records for Budget Control {budget_control_name}"
+        }
 
     except Exception as e:
         frappe.db.rollback()
-        return {"success": False, "error": str(e)}
+        print(f"FATAL ERROR: {str(e)}")
+        frappe.log_error(
+            title="Error in delete_budget_related_records",
+            message=frappe.get_traceback()
+        )
+        return {
+            "success": False,
+            "error": str(e)
+        }
