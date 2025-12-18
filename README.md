@@ -130,6 +130,7 @@ Check out the demo of **Budget Control Center**:
 ### Complete Workflow Scenario
 
 Step 1: Create Budget Control
+
     ┌─────────────────────────────────────────────────────┐
     │  Create Budget Control Document                     │
     ├─────────────────────────────────────────────────────┤
@@ -363,8 +364,22 @@ Step 6: Create Purchase Order (Exceeds Budget)
 
 # 1- **Configuration Options**
 **Budget Actions**
-Configure system behavior when monthly budgets are exceeded:
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <b> Stop </b><br>
+      <img src="stop.png" width="100%" alt="Stop">
+    </td>
+    <td align="center" width="50%">
+      <b> Warn</b><br>
+      <img src="confirm.png" width="100%" alt="Warn">
+    </td>
+  </tr>
+</table>
 
+```
+Configure system behavior when monthly budgets are exceeded:
+```
 - `Action if Monthly Budget Exceeded on Purchase Order = Stop`
 - `Action if Monthly Budget Exceeded on Purchase Order = Warn`
 
