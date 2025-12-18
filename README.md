@@ -37,7 +37,7 @@
     mv budget-management-system/ budget
 3. Install the app on your site:
     ```bash
-    be  nch --site your-site-name install-app budget
+    bench --site your-site-name install-app budget
 
 # 📊 Budget Control Dashboard
 
