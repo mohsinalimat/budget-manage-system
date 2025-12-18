@@ -389,7 +389,7 @@ class BudgetControl(Document):
         )
 
 @frappe.whitelist()
-def get_monthly_distribution_department(cost_center, fiscal_year, department):
+def get_monthly_distribution_department(cost_center, fiscal_year, department, budget):
     allocations = []
     # هات كل الـ Monthly Distributions الخاصة بالـ Cost Center
     monthly_distributions = frappe.get_all(
@@ -397,7 +397,8 @@ def get_monthly_distribution_department(cost_center, fiscal_year, department):
         filters={
             "custom_cost_center": cost_center,
             "fiscal_year":fiscal_year,
-            "custom_department":department
+            "custom_department":department,
+            "custom_budget":budget
              },
         fields=[
             "name",
@@ -633,7 +634,7 @@ def update_budget_amount(cost_center, item_code, account, month, new_amount, act
         # تحديث Monthly Distribution
         success = update_monthly_distribution(md_name, month, new_amount, action)
 
-
+        print('success ==>',success)
         if success and success.get("success") == True:
             # إضافة سجل في Budget Control Log
             create_budget_log(
@@ -717,10 +718,24 @@ def update_monthly_distribution(md_name, month, diff_amount, action):
         if not md_name:
             frappe.throw(_("No Monthly Distribution linked"))
 
+        exists = frappe.db.exists("Monthly Distribution", md_name)
+        print("exists:", exists)
+        if not exists:
+            frappe.throw(_(f"Monthly Distribution : {md_name} does not exist"))
+
         monthly_dist_doc = frappe.get_doc("Monthly Distribution", md_name)
+        print("monthly_dist_doc",monthly_dist_doc)
+
+        budget_exists = frappe.db.exists("Budget", monthly_dist_doc.custom_budget)
+        if not budget_exists:
+            frappe.throw(_(f"Budget {monthly_dist_doc.custom_budget} does not exist"))
+
         budget_doc = frappe.get_doc("Budget", monthly_dist_doc.custom_budget)
-        updated_table['budget_name'] = monthly_dist_doc.budget
+        print("budget_doc",budget_doc)
+
+        updated_table['budget_name'] = monthly_dist_doc.custom_budget
         # تعديل الاجمالي
+        print("updated_table",updated_table)
         budget_account = next(
             (
                 row
@@ -729,6 +744,7 @@ def update_monthly_distribution(md_name, month, diff_amount, action):
             ),
             None,
         )
+        print("budget_account:", budget_account)
         if not budget_account:
             frappe.throw(_("Account not found in Budget"))
 
@@ -785,6 +801,7 @@ def update_monthly_distribution(md_name, month, diff_amount, action):
         budget_doc.save()
         monthly_dist_doc.save()
         updated_table['success'] = True
+        print("updated_table",updated_table)
         return updated_table
 
     except Exception as e:

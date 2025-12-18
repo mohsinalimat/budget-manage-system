@@ -470,7 +470,8 @@ frappe.ui.form.on('Budget Control', {
                 args: {
                     cost_center: frm.doc.cost_center,
                     fiscal_year: frm.doc.fiscal_year,
-                    department: frm.doc.department
+                    department: frm.doc.department,
+                    budget: frm.doc.budget
                 },
                 callback: function(r) {
                         console.log('Budget Data:', r.message);
@@ -1046,7 +1047,10 @@ function load_dashboard_data(frm) {
     frappe.call({
         method: "budget.budge.doctype.budget_control.budget_control.get_monthly_distribution_department",
         args: {
-            cost_center: frm.doc.cost_center
+            cost_center: frm.doc.cost_center,
+            fiscal_year: frm.doc.fiscal_year,
+            department: frm.doc.department,
+            budget: frm.doc.budget
         },
         callback: function(r) {
             if (r.message && r.message.length > 0) {

@@ -225,33 +225,29 @@ def create_budget_with_distributions_server(budget_request):
 
         # إنشاء Monthly Distribution لكل صف
         for item in accepted_items:
-            # إنشاء Monthly Distribution
+
+            account_budget = {
+                "account": item.expense_account,
+                "budget_amount": float(item.total or 0),
+                "custom_item_code": item.item_code
+            }
+            # for Each Item ->  Monthly Distribution
             monthly_dist = create_monthly_distribution_server(budget_request, item)
             if monthly_dist:
                 print('monthly_dist',monthly_dist.name)
                 # إعداد الـ account budget
-                account_budget = {
-                    "account": item.expense_account,
-                    "budget_amount": float(item.total or 0),
-                    "custom_monthly_distribution": monthly_dist.name,
-                    "custom_item_code": item.item_code
-                }
+                account_budget["custom_monthly_distribution"]= monthly_dist.name,
+
                 accounts_table.append(account_budget)
 
         # إنشاء البادجيت
         budget = create_budget_document_server(budget_request, accounts_table)
-        print('budget',budget.name)
-        monthly_dist.db_set("custom_budget", budget.name)
-        frappe.db.commit()
+        # print('budget',budget.name)
+        # monthly_dist.custom_budget = budget.name
+        # monthly_dist.save(ignore_permissions=True)
+        # monthly_dist.db_set("custom_budget", budget.name)
+        # frappe.db.commit()
         # ربط الـ distributions بالبادجيت
-        for row in accounts_table:
-            frappe.db.set_value(
-                'Monthly Distribution',
-                row['custom_monthly_distribution'],
-                'budget',
-                budget.name
-            )
-
         return budget.name
 
     except Exception as e:
@@ -270,6 +266,7 @@ def create_monthly_distribution_server(budget_request, item):
     monthly_dist.fiscal_year = budget_request.fiscal_year
     monthly_dist.custom_expense_account = item.expense_account
     monthly_dist.custom_cost_center = budget_request.cost_center
+    # monthly_dist.custom_budget =1
     monthly_dist.custom_budget_control = budget_request.budget_control
     monthly_dist.custom_item_code = item.item_code
     monthly_dist.custom_department = budget_request.department
@@ -307,12 +304,21 @@ def create_budget_document_server(budget_request, accounts_table):
         budget.insert()
         print(f"Budget inserted with name: {budget.name}")
 
+        for account_data in accounts_table:
+            md_doc = frappe.get_doc("Monthly Distribution", account_data['custom_monthly_distribution'])
+            md_doc.custom_budget = budget.name
+            md_doc.save(ignore_permissions=True)
+
+
+        control_doc = frappe.get_doc("Budget Control", budget_request.budget_control)
+        control_doc.db_set("budget", budget.name)
+
         print("Submitting budget...")
         budget.submit()
         print(f"Budget submitted, docstatus: {budget.docstatus}")
-
         frappe.db.commit()
-        print(f"Budget committed to database")
+        print(f"Budget submitted, docstatus: {budget.docstatus}")
+
     except Exception as e:
         print(f"ERROR in create_budget_document_server: {str(e)}")
         frappe.log_error(

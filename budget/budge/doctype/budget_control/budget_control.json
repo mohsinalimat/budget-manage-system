@@ -15,6 +15,7 @@
   "budget_controller",
   "cost_center",
   "status",
+  "budget",
   "section_break_kv81l",
   "amended_from",
   "workflow_state",
@@ -98,6 +99,12 @@
    "label": "Cost Center",
    "options": "Cost Center",
    "reqd": 1
+  },
+  {
+   "fieldname": "budget",
+   "fieldtype": "Link",
+   "label": "Budget",
+   "options": "Budget"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -108,7 +115,7 @@
    "link_fieldname": "budget_control"
   }
  ],
- "modified": "2025-08-25 22:05:07.474631",
+ "modified": "2025-12-18 16:44:12.027780",
  "modified_by": "Administrator",
  "module": "budge",
  "name": "Budget Control",
