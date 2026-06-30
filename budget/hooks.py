@@ -1,7 +1,7 @@
 from . import __version__ as app_version
 
-app_name = "budget"
-app_title = "budget"
+app_name = "budget_controller"
+app_title = "budget controller"
 app_publisher = "ahmed"
 app_description = "budget"
 app_email = "ahmed"
@@ -11,12 +11,12 @@ app_license = "MIT"
 # ------------------
 required_apps = ["erpnext"]
 add_to_apps_screen = [
-	{
-		"name": "budget",
-		"logo": "/assets/budget/images/budget_icon_1.png",
-		"title": "Budget & Expenses",
-		"route": "/desk/budget",
-	}
+    {
+        "name": "budget_controller",
+        "logo": "/assets/budget/images/budget_icon.png",
+        "title": "Budget Expenses",
+        "route": "/desk/budget-expenses",
+    }
 ]
 # include js, css files in header of desk.html
 # app_include_css = "/assets/budget/css/budget.css"

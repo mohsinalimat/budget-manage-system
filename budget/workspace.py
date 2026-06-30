@@ -1,7 +1,7 @@
 import frappe
 
 
-WORKSPACE_NAME = "Budget & Expenses"
+WORKSPACE_NAME = "Budget Expenses"
 
 
 def create_workspace():
@@ -112,10 +112,32 @@ def create_workspace():
                 "label": "Budget Control",
                 "link_to": "budget-control-page",
                 "type": "Page",
-                "color": "#0653cf",
-                "format": "",
-                "icon": "",
+                "icon": "dashboard",
             },
+            {
+                "label": "Budget Request",
+                "link_to": "Budget Request",
+                "type": "DocType",
+                "icon": "file-text",
+            },
+            {
+                "label": "Budget",
+                "link_to": "Budget",
+                "type": "DocType",
+                "icon": "income",
+            },
+            {
+                "label": "Monthly Distribution",
+                "link_to": "Monthly Distribution",
+                "type": "DocType",
+                "icon": "calendar",
+            },
+            {
+                "label": "Budget Control Log",
+                "link_to": "Budget Control Log",
+                "type": "DocType",
+                "icon": "list",
+            }
         ],
         "quick_lists": [],
         "roles": [],
