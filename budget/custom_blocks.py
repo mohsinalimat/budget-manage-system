@@ -6,9 +6,9 @@ CUSTOM_BLOCKS = [
         "html": (
             "<div class=\"container\">\n"
             "  <!-- Under Development -->\n"
-            "  <div class=\"desc disabled\"\n"
-            "       onclick=\"frappe.msgprint(__('Still under development'))\">\n"
-            "    Budget vs Actual Comparison (Items)\n"
+            "  <div class=\"desc\"\n"
+            "       onclick=\"frappe.set_route('query-report', 'Budget Overview Report')\">\n"
+            "    Budget Overview Report\n"
             "  </div>\n\n"
             "  <!-- Active -->\n"
             "  <div class=\"desc\"\n"
