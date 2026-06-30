@@ -1,7 +1,7 @@
 from . import __version__ as app_version
 
 app_name = "budget"
-app_title = "budge"
+app_title = "budget"
 app_publisher = "ahmed"
 app_description = "budget"
 app_email = "ahmed"
@@ -9,7 +9,15 @@ app_license = "MIT"
 
 # Includes in <head>
 # ------------------
-
+required_apps = ["erpnext"]
+add_to_apps_screen = [
+	{
+		"name": "budget",
+		"logo": "/assets/budget/images/budget_icon_1.png",
+		"title": "Budget & Expenses",
+		"route": "/desk/budget",
+	}
+]
 # include js, css files in header of desk.html
 # app_include_css = "/assets/budget/css/budget.css"
 # app_include_js = "/assets/budget/js/budget.js"
@@ -62,16 +70,13 @@ app_license = "MIT"
 
 # Installation
 # ------------
-
-# before_install = "budget.install.before_install"
-# after_install = "budget.install.after_install"
+after_install = "budget.setup.after_install"
 
 # Uninstallation
 # ------------
 
 # before_uninstall = "budget.uninstall.before_uninstall"
-# after_uninstall = "budget.uninstall.after_uninstall"
-before_uninstall = "budget.patches.v15_0.remove_budget_field.execute"
+before_uninstall = "budget.setup.before_uninstall"
 
 # Integration Setup
 # ------------------
@@ -120,7 +125,7 @@ before_uninstall = "budget.patches.v15_0.remove_budget_field.execute"
 # Hook on document methods and events
 doc_events = {
     "Department": {
-        "after_insert": "budget.budge.event.department.create_Head_role_for_department"
+        "after_insert": "budget.budget.event.department.create_Head_role_for_department"
     }
 }
 
@@ -227,49 +232,12 @@ doc_events = {
 fixtures = [
     {
         "dt": "DocType Link",
-        "filters": [["parent", "in", ["Budget Control", "Budget Request"]]]
-    },
-    {
-        "dt": "Workspace",
-        "filters": [
-            ["module", "=", "budge"]    
-        ]
-    },
-    {
-        "dt": "Report",
-        "filters": [["module", "=", "Budge"]]
-    },
-    {
-        "dt": "Custom HTML Block",
-        "filters": [["name", "in", ["Budget reports"]]]
-    },
-    {
-        "dt": "Number Card",
-        "filters": [["module", "=", "Budge"]]
+        "filters": [["parent", "in", ["Budget Request"]]]
     },
     {
         "dt": "Client Script",
         "filters": [
-            ["module", "=", "budge"]
+            ["module", "=", "budget"]
         ]
     },
-    {
-        "dt": "Server Script",
-        "filters": [
-            ["module", "=", "budge"]
-        ]
-    },
-    {
-        "dt": "DocType",
-        "filters": [
-            ["module", "=", "budge"]
-        ]
-    },
-    {
-    "doctype": "Custom Field",
-    "filters": [
-        ["dt", "in", ["Monthly Distribution Percentage","Department","Treasury bills", "Budget Control", "Budget Request", "Budget", "Monthly Distribution", "Budget Account"]]
-    ]
-    }
-
 ]

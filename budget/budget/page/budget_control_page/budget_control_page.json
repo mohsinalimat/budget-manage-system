@@ -1,0 +1,18 @@
+{
+ "content": null,
+ "creation": "2026-06-28 23:35:47.851188",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2026-06-28 23:35:47.851188",
+ "modified_by": "Administrator",
+ "module": "budget",
+ "name": "budget-control-page",
+ "owner": "Administrator",
+ "page_name": "budget-control-page",
+ "roles": [],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0
+}
